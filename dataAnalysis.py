@@ -3,39 +3,94 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import OneClassSVM
+from sklearn.preprocessing import StandardScaler
+
 plt.style.use('ggplot')
+
+def define_bp(data, bp_name, start_frequency, end_frequency):
+    for frequency in range(start_frequency, end_frequency + 1, 1):
+        data[bp_name] = 0
+        data[bp_name] += data['{}Hz'.format(frequency)]
+    
+    return data
 
 def get_data(file_path):
     data = pd.read_csv(file_path)
-    print(data.head())
     data.rename({ '0Hz': 'label' }, axis=1, inplace=True)
-    psd_data = (data / 10 ** 3) ** 2
+    
+    data = data.iloc[1:]
+    data = data[int(data.shape[0] * 0.15): int(data.shape[0] * 0.85)]
 
-    for frequency in range(4, 8 + 1, 1):
-        psd_data['theta'] = 0
-        psd_data['theta'] += psd_data['{}Hz'.format(frequency)]
+    brainwaves = [
+        ['theta', 4, 7],
+        ['low_alpha', 8, 9],
+        ['middle_alpha', 9, 12],
+        ['high_alpha', 12, 14],
+        ['low_beta', 13, 16],
+        ['middle_beta', 17, 20],
+        ['high_beta', 21, 28],
+    ]
+    
+    for brainwave in brainwaves:
+        data = define_bp(data, brainwave[0], brainwave[1], brainwave[2])
 
-    return psd_data
+    # data['theta'] = (1 / (1 + np.exp(-0.2 * (data['theta'] / 10 ** 3))) * 2 - 2) * -1 
+    return data / 1000
 
-unfocused_data = get_data('./data/Mocx_0.csv')[5000:7500] / 1e7
-focused_data = get_data('./data/Mocx_1.csv')[5000:7500] / 1e7
-unfocused_data['label'] = 0
+# for i in range(20):
+unfocused_data = get_data('./data/unfocused/lin_1.csv')
+focused_data = get_data('./data/focused/lin_1.csv')
+unfocused_data['label'] = 1
+focused_data['label'] = 2
 
-
-data = unfocused_data.append(focused_data) 
-
-sns.barplot(x='label', y='theta', data=data)
-# sns.scatterplot(x='low_beta', y='high_beta', hue='label', data=data)
-plt.show()
-# plt.clf()
-# sns.scatterplot(x='low_alpha', y='high_alpha', hue='label', data=data)
-# plt.show()
+unfocused_data = unfocused_data[['theta', 'low_alpha']].values
+focused_data = focused_data[['theta', 'low_alpha']].values
 
 
-# fig = plt.figure()
-# for row_index in range(psd_data.shape[0]):
-#     fig.clf()
-#     plt.ylim(0, 60000000)
-#     psd_data.iloc[row_index].plot(kind='bar')
-#     plt.draw()
-#     plt.pause(0.00000001)
+svdd = OneClassSVM(gamma='auto')
+svdd.fit(unfocused_data)
+
+count = 0
+score = svdd.predict(focused_data)
+for i in score:
+    if i > 0:
+        count += 1
+
+print(count / score.shape[0])
+
+# count = 0
+# score = svdd.score_samples(unfocused_data)
+# for i in score:
+#     if i > 0:
+#         count += 1
+
+# print(score.shape)
+# print(count)
+
+# data = unfocused_data.append(focused_data)
+# data = data[int(data.shape[0] * 0.2): int(data.shape[0] * 0.8)]
+# brainwave_data = data[['theta', 'low_alpha', 'middle_alpha', 'high_alpha', 'middle_beta', 'high_beta']].values
+# label = data['label'].values
+
+# test_unfocused_data = get_data('./data/unfocused/lin_2.csv')
+# test_focused_data = get_data('./data/focused/lin_2.csv')
+# test_unfocused_data['label'] = 1
+# test_focused_data['label'] = 2
+# test_data = test_unfocused_data.append(test_focused_data)
+# test_data = test_data[int(test_data.shape[0] * 0.2): int(test_data.shape[0] * 0.8)]
+# test_brainwave_data = test_data[['theta', 'low_alpha', 'middle_alpha', 'high_alpha', 'middle_beta', 'high_beta']].values
+# test_label = test_data['label'].values
+
+# print(data.info())
+
+# print(test_data.info())
+
+# knn = KNeighborsClassifier(n_neighbors=5)
+# knn.fit(brainwave_data, label)
+
+# print(knn.score(test_brainwave_data, test_label))
+    # sns.barplot(x='label', y='theta', data=data)
+    # plt.show()
+    # plt.clf()
