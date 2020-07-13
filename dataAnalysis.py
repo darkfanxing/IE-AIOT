@@ -3,10 +3,9 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 import tensorflow as tf
 from tensorflow.keras import Sequential 
-from tensorflow.keras.layers import Dense, Dropout, LSTM, Conv1D, Embedding, TimeDistributed, LeakyReLU, Attention, RepeatVector
+from tensorflow.keras.layers import Dense, Dropout, LSTM, Conv1D, Embedding, TimeDistributed, LeakyReLU, Attention, RepeatVector, Input
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
-from test import AttentionDecoder
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.signal as signal
@@ -99,25 +98,24 @@ def get_train_and_test_data(unfocused_data, focused_data, offset_index):
 
 
 def get_model(input_shape):
-    model = Sequential()
-    model.add(Conv1D(32, 3, input_shape=input_shape[1:]))
+    _input = Input(input_shape[1:]) 
+    model = Conv1D(64, 5, activation="relu")(_input)
+    model = []  
+    model.add()
+    model.add(Dense(128))
+    model.add(LeakyReLU(alpha=0.4))
+    model.add(LSTM(64))
+    # model.add(LeakyReLU(alpha=0.2))
     
-    model.add(LSTM(64, return_sequences=True))
-    model.add(AttentionDecoder(64, 2))
-    # model.add(LSTM(64))
-    # model.add(LeakyReLU(alpha=0.2))
-    # model.add(Attention([]))
-    # model.add(LSTM(64))
-    # model.add(LeakyReLU(alpha=0.2))
-    # model.add(Dropout(0.3))
-    # # model.add(Dense(128))
-    # # model.add(LeakyReLU(alpha=0.4))
-    # model.add(Dense(64))
-    # model.add(LeakyReLU(alpha=0.4))
-    # model.add(Dense(16))
-    # model.add(LeakyReLU(alpha=0.4))
-    # model.add(Dense(2, activation="softmax", kernel_initializer="he_normal"))
-    model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.001, decay=1e-6), metrics=['accuracy'])
+    model.add(Dropout(0.3))
+    model.add(Dense(128))
+    model.add(LeakyReLU(alpha=0.4))
+    model.add(Dense(64))
+    model.add(LeakyReLU(alpha=0.4))
+    model.add(Dense(16))
+    model.add(LeakyReLU(alpha=0.4))
+    model.add(Dense(2, activation="softmax", kernel_initializer="he_normal"))
+    model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.005, decay=1e-6), metrics=['accuracy'])
     return model
 
 
