@@ -98,10 +98,9 @@ def get_train_and_test_data(unfocused_data, focused_data, offset_index):
 
 
 def get_model(input_shape):
-    _input = Input(input_shape[1:]) 
-    model = Conv1D(64, 5, activation="relu")(_input)
-    model = []  
-    model.add()
+    model = Sequential()
+    model.add(Conv1D(64, 5, activation="relu"))
+    model.add(LSTM(64, return_sequences=True))
     model.add(Dense(128))
     model.add(LeakyReLU(alpha=0.4))
     model.add(LSTM(64))
@@ -115,7 +114,7 @@ def get_model(input_shape):
     model.add(Dense(16))
     model.add(LeakyReLU(alpha=0.4))
     model.add(Dense(2, activation="softmax", kernel_initializer="he_normal"))
-    model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.005, decay=1e-6), metrics=['accuracy'])
+    model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.001, decay=1e-6), metrics=['accuracy'])
     return model
 
 
