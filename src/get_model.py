@@ -1,7 +1,6 @@
 from keras.layers import Layer, Flatten, Conv1D, Activation, GlobalAveragePooling1D, Reshape, merge, Input, BatchNormalization, GRU, concatenate, Dense, Dropout, Flatten
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras import regularizers
-from tensorflow.keras.optimizers import Adam
 
 # the best accuracy: 77%
 def get_cnn_rnn_model():
@@ -67,6 +66,5 @@ def get_cnn_model(input_shape):
     model.add(Dense(2))
     model.add(Activation("sigmoid"))
     
-    model.compile(loss="binary_crossentropy",
-                optimizer="adam") 
+    model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]) 
     return "CNN", model
