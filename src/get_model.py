@@ -2,11 +2,10 @@ from keras.layers import Layer, Flatten, Conv1D, Activation, GlobalAveragePoolin
 from keras.models import Model, Sequential
 from keras import regularizers
 
-# the best accuracy: 77%
-def get_cnn_rnn_model():
+def get_cnn_rnn_model(input_shape):
   left_hidden_units = 64
 
-  _input = Input(shape=(10, 2))
+  _input = Input(shape=input_shape)
   right_model_input = Conv1D(128, 3, padding="same")(_input)
   right_model_input = BatchNormalization()(right_model_input)
   right_model_input = Activation("relu")(right_model_input)
@@ -49,7 +48,6 @@ def get_cnn_rnn_model():
 
   return "CNN-RNN", model
 
-# average accuracy: 66%
 def get_cnn_model(input_shape):
     model = Sequential()
     model.add(Conv1D(128, 3, padding="same", input_shape=input_shape[1:]))

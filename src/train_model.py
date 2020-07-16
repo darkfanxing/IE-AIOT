@@ -8,10 +8,14 @@ from tensorflow.python.framework import ops
 from keras import backend as K
 from utility import get_data, change_to_sequence_data
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set(style="darkgrid")
+
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
-
 
 def shuffle_data_and_label(data, label):
     np.random.seed(20)
@@ -64,7 +68,6 @@ def get_unfocused_and_focused_data():
         focused_data = np.vstack((focused_data, get_data("./data/focused/{}".format(file_path), True)))
 
     unfocused_data, focused_data = unfocused_data[1:], focused_data[1:]
-
     return unfocused_data, focused_data
 
 
@@ -80,10 +83,12 @@ def save_model(model_name):
 
 if __name__ == "__main__":
     unfocused_data, focused_data = get_unfocused_and_focused_data()
+    print(unfocused_data[:2])
+    print(unfocused_data.shape, focused_data.shape)
     x_train, y_train, x_test, y_test = get_train_and_test_data(unfocused_data, focused_data, 10)
 
     for _ in range(50):
-        model_name, model = get_cnn_model(x_train.shape)
+        model_name, model = get_cnn_rnn_model(x_train.shape[1:])
         callback = EarlyStopping(monitor="loss", patience=30, verbose=2, mode="auto")
         model.fit(x_train, y_train, epochs=1000, batch_size=64, callbacks=[callback], verbose=1)
         

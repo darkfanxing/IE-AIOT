@@ -9,7 +9,7 @@ def wavelet(data):
 
 
 def normalize(data):
-    data = data.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
+    data = data.apply(lambda x: wavelet((x - np.mean(x)) / (np.max(x) - np.min(x))))
     return data
 
 
@@ -29,7 +29,7 @@ def get_data(file_path, is_capture_mid_data=False):
     if is_capture_mid_data:
         data = data[int(data.shape[0] * 0.2): int(data.shape[0] * 0.8)]
 
-    data = normalize(data)  
+    data = normalize(data)
     # selected band
     
     brainwaves = [
