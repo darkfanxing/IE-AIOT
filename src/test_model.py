@@ -19,15 +19,14 @@ def load_model(model_name, model_weights_filename):
   return model
 
 if __name__ == "__main__":
-  model = load_model("CNN-RNN", "CNN-RNN-61(-3395)")
+  model = load_model("new-CNN-RNN", "new")
   
   # Change your file path
-  data_path = "./data/focused/darkfanxing_1.csv"
+  data_path = "./data/unfocused/kuo_1.csv"
   data = get_data(data_path)
   data = change_to_sequence_data(data)
 
-  predictions = np.argmax(model.predict(data), axis=-1)
+  predictions = model.predict(data)
   # predictions = np.where(predictions==1)[1]
   
-  sns.lineplot(x=[time for time in range(predictions.shape[0])], y=predictions).set(xlabel="time(s)", ylabel="is_focused")
-  plt.show()
+  sns.lineplot(x=[time for time in range(predictions.shape[0])], y=predictions[:, 0]).set(xlabel="time(s)", ylabel="focused_score")

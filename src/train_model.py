@@ -31,12 +31,14 @@ def get_train_and_test_data(unfocused_data, focused_data, offset_index):
 
     data = np.vstack((unfocused_data, focused_data))
 
-    onehotencoder = OneHotEncoder()
-    label = onehotencoder.fit_transform([[0]] * unfocused_data.shape[0] + [[1]] * focused_data.shape[0]).toarray()
+    label = np.array([0] * unfocused_data.shape[0] + [1] * focused_data.shape[0])
+    print(label.shape)
+    # onehotencoder = OneHotEncoder()
+    # label = onehotencoder.fit_transform([[0]] * unfocused_data.shape[0] + [[1]] * focused_data.shape[0]).toarray()
 
     data, label = shuffle_data_and_label(data, label)
 
-    split_index = int(data.shape[0] * 0.8)
+    split_index = int(data.shape[0] * 0.85)
     x_train, y_train = data[:split_index], label[:split_index]
     x_test, y_test = data[split_index:], label[split_index:]
 
@@ -44,9 +46,12 @@ def get_train_and_test_data(unfocused_data, focused_data, offset_index):
 
 
 def get_accuracy(predictions, label):
+    test = predictions
+    test[test >= 0.5] = 100
+    test[test < 0.5] = 0
     count = 0
     for index in range(len(label)):
-        if label[0, predictions[index]] == 1:
+        if label[index] == test[index][0]:
             count += 1
 
     return count / len(label)
@@ -71,7 +76,7 @@ def get_unfocused_and_focused_data():
     return unfocused_data, focused_data
 
 
-def save_model(model_name):
+def save_model(model_name, accuracy):
     model_path = os.getcwd() + "/model/"
     architecture_name = "{}.json".format(model_name)
 
@@ -83,19 +88,33 @@ def save_model(model_name):
 
 if __name__ == "__main__":
     unfocused_data, focused_data = get_unfocused_and_focused_data()
-    print(unfocused_data[:2])
-    print(unfocused_data.shape, focused_data.shape)
     x_train, y_train, x_test, y_test = get_train_and_test_data(unfocused_data, focused_data, 10)
+    print(x_train.shape)
+    # for _ in range(1):
+    #     model_name, model = get_cnn_rnn_model(x_train.shape[1:])
 
-    for _ in range(50):
-        model_name, model = get_cnn_rnn_model(x_train.shape[1:])
-        callback = EarlyStopping(monitor="loss", patience=30, verbose=2, mode="auto")
-        model.fit(x_train, y_train, epochs=1000, batch_size=64, callbacks=[callback], verbose=1)
+    #     callback = EarlyStopping(monitor="loss", patience=30, verbose=2, mode="auto")
+    #     model.fit(x_train, y_train, epochs=1000, batch_size=64, callbacks=[callback], verbose=1)
         
-        predictions = np.argmax(model.predict(x_test), axis=-1)
-        accuracy = round(get_accuracy(predictions, y_test), 2) * 100
-        print("Model accuracy is {}%".format(accuracy))
+    #     # predictions = np.argmax(model.predict(x_test), axis=-1)
+    #     predictions = model.predict(x_test)
+    #     # accuracy = round(get_accuracy(predictions, y_test), 2) * 100
+    #     # print("Model accuracy is {}%".format(accuracy))
 
-        save_model(model_name)
-        K.clear_session()
-        ops.reset_default_graph()
+    #     model_path = os.getcwd() + "/model/"
+    #     architecture_name = "{}.json".format(model_name)
+
+    #     if architecture_name not in os.listdir(model_path):
+    #         with open(model_path + architecture_name, "w") as f:
+    #             f.write(model.to_json())
+
+    #     model.save_weights('model/new.h5')
+
+    #     # # save_model(model_name, accuracy)
+    #     # K.clear_session()
+    #     # ops.reset_default_graph()
+
+    #     # print(predictions[:20])
+
+    #     # sns.lineplot(x=[time for time in range(predictions.shape[0])], y=predictions[:, 0]).set(xlabel="time(s)", ylabel="focused_score")
+    #     # plt.show()

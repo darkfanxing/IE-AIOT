@@ -38,15 +38,29 @@ def get_cnn_rnn_model(input_shape):
   model_input = Dropout(0.5)(model_input)
   model_input = Dense(128)(model_input)
   model_input = BatchNormalization()(model_input)
-  model_input = Dense(2)(model_input)
+  model_input = Activation("relu")(model_input)
+  model_input = Dense(64)(model_input)
   model_input = BatchNormalization()(model_input)
+  model_input = Activation("relu")(model_input)
+  model_input = Dense(32)(model_input)
+  model_input = BatchNormalization()(model_input)
+  model_input = Activation("relu")(model_input)
+  model_input = Dense(16)(model_input)
+  model_input = BatchNormalization()(model_input)
+  model_input = Activation("relu")(model_input)
+  model_input = Dense(1)(model_input)
   model_output = Activation("sigmoid")(model_input)
+  
+
+  # model_input = Dense(2)(model_input)
+  # model_input = BatchNormalization()(model_input)
+  # model_output = Activation("sigmoid")(model_input)
 
   model = Model(_input, model_output)
 
-  model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+  model.compile(loss="mean_squared_error", optimizer="adam", metrics=["accuracy"])
 
-  return "CNN-RNN", model
+  return "new-CNN-RNN", model
 
 def get_cnn_model(input_shape):
     model = Sequential()
