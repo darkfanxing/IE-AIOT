@@ -6,7 +6,7 @@ from get_model import get_cnn_rnn_model, get_cnn_model
 import random
 from tensorflow.python.framework import ops
 from keras import backend as K
-from utility import get_data, change_to_sequence_data
+from utility import get_data, change_to_sequence_data, signal_filter
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -88,27 +88,28 @@ def save_model(model_name, accuracy):
 
 if __name__ == "__main__":
     unfocused_data, focused_data = get_unfocused_and_focused_data()
-    x_train, y_train, x_test, y_test = get_train_and_test_data(unfocused_data, focused_data, 10)
+    x_train, y_train, x_test, y_test = get_train_and_test_data(unfocused_data, focused_data, 16)
+
     print(x_train.shape)
-    # for _ in range(1):
-    #     model_name, model = get_cnn_rnn_model(x_train.shape[1:])
+    for _ in range(1):
+        model_name, model = get_cnn_rnn_model(x_train.shape[1:])
 
-    #     callback = EarlyStopping(monitor="loss", patience=30, verbose=2, mode="auto")
-    #     model.fit(x_train, y_train, epochs=1000, batch_size=64, callbacks=[callback], verbose=1)
+        callback = EarlyStopping(monitor="loss", patience=30, verbose=2, mode="auto")
+        model.fit(x_train, y_train, epochs=1000, batch_size=64, callbacks=[callback], verbose=1)
         
-    #     # predictions = np.argmax(model.predict(x_test), axis=-1)
-    #     predictions = model.predict(x_test)
-    #     # accuracy = round(get_accuracy(predictions, y_test), 2) * 100
-    #     # print("Model accuracy is {}%".format(accuracy))
+        # predictions = np.argmax(model.predict(x_test), axis=-1)
+        predictions = model.predict(x_test)
+        # accuracy = round(get_accuracy(predictions, y_test), 2) * 100
+        # print("Model accuracy is {}%".format(accuracy))
 
-    #     model_path = os.getcwd() + "/model/"
-    #     architecture_name = "{}.json".format(model_name)
+        model_path = os.getcwd() + "/model/"
+        architecture_name = "{}.json".format(model_name)
 
-    #     if architecture_name not in os.listdir(model_path):
-    #         with open(model_path + architecture_name, "w") as f:
-    #             f.write(model.to_json())
+        if architecture_name not in os.listdir(model_path):
+            with open(model_path + architecture_name, "w") as f:
+                f.write(model.to_json())
 
-    #     model.save_weights('model/new.h5')
+        model.save_weights('model/new.h5')
 
     #     # # save_model(model_name, accuracy)
     #     # K.clear_session()
