@@ -12,7 +12,7 @@ def get_cnn_rnn_model(input_shape):
   right_model_input = Conv1D(256, 3)(right_model_input)
   right_model_input = BatchNormalization()(right_model_input)
   right_model_input = Activation("relu")(right_model_input)
-  right_model_input = Conv1D(128, 3)(right_model_input)
+  right_model_input = Conv1D(128,  3)(right_model_input)
   right_model_input = BatchNormalization()(right_model_input)
   right_model_input = Activation("relu")(right_model_input)
   right_model_input = GlobalAveragePooling1D()(right_model_input)

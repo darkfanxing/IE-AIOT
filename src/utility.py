@@ -1,25 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# 如果觉得不错，可以推荐给你的朋友！http://tool.lu/pyc
+
 import pandas as pd
 import numpy as np
 from modwt import modwt, imodwt
 from scipy import stats
 from nolitsa import surrogates
 from sklearn import preprocessing
-
-def normalize(data):
-    data = data.apply((lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x))))
-    return data
-
-
-def define_bp(data, bp_name, start_frequency, end_frequency):
-    data[bp_name] = 0
-    for frequency in range(start_frequency, end_frequency + 1, 1):
-        data[bp_name] += data['{}Hz'.format(frequency)]
-    
-    return data
-
 
 def get_data(file_path, is_capture_mid_data = (False,)):
     data = np.genfromtxt(file_path, delimiter=',').astype(int)
