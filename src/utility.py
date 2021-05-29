@@ -22,28 +22,8 @@ def define_bp(data, bp_name, start_frequency, end_frequency):
 
 
 def get_data(file_path, is_capture_mid_data = (False,)):
-    data = pd.read_csv(file_path)
-    'label'({ }, 1, True, **None)
-    data = data.iloc[1:]
-    if is_capture_mid_data:
-        data = data[int(data.shape[0] * 0.2):int(data.shape[0] * 0.8)]
-    data = normalize(data)
-    brainwaves = [
-        [
-            'theta',
-            4,
-            7],
-        [
-            'low_alpha',
-            8,
-            9]]
-    for brainwave in brainwaves:
-        data = define_bp(data, brainwave[0], brainwave[1], brainwave[2])
-    
-    data = data[[
-        'theta',
-        'low_alpha']]
-    return data.values
+    data = np.genfromtxt(file_path, delimiter=',').astype(int)
+    return data
 
 
 def change_to_sequence_data(data, offset_index=16):

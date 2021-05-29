@@ -60,7 +60,7 @@ def get_cnn_rnn_model(input_shape):
 
   model.compile(loss="mean_squared_error", optimizer="adam", metrics=["accuracy"])
 
-  return "new-CNN-RNN", model
+  return "lastest-CNN-RNN", model
 
 def get_cnn_model(input_shape):
     model = Sequential()
